@@ -1,9 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-# etcd version.
-etcd_ver = "#{etcd_ver}"
-
 # The calicoctl download URL.
 calicoctl_url = "https://github.com/projectcalico/calico-containers/releases/download/v1.0.0/calicoctl"
 
@@ -25,8 +22,8 @@ primary_ip = "172.17.7.101"
 
 Vagrant.configure(2) do |config|
   # always use Vagrants insecure key
-  config.ssh.insert_key = true
-  config.ssh.username = "vagrant"
+  config.ssh.insert_key = 'true'
+  config.ssh.username = 'vagrant'
 
   # Use Bento Ubuntu 16.04 box (officially-recommended box by Vagrant)
   # https://www.vagrantup.com/boxes.html
@@ -55,35 +52,23 @@ Vagrant.configure(2) do |config|
 
       # The docker provisioner installs docker.
       host.vm.provision :docker, images: [
-          "busybox:latest",
-          "calico/node:#{calico_node_ver}"
+          "calico/node:#{calico_node_ver}",
+          "calico/ctl:#{calico_node_ver}",
       ]
 
-      # Calico uses etcd for calico and docker clustering. Install it on the first host only.
-      if i == 1
-        # Download etcd and start.
-        host.vm.provision :shell, inline: <<-SHELL
-          # sudo apt-get install -y unzip
-          curl -L --silent https://github.com/coreos/etcd/releases/download/v#{etcd_ver}/etcd-v#{etcd_ver}-linux-amd64.tar.gz -o etcd-v#{etcd_ver}-linux-amd64.tar.gz
-          tar xzvf etcd-v#{etcd_ver}-linux-amd64.tar.gz
-          nohup etcd-v#{etcd_ver}-linux-amd64/etcd --addr=#{primary_ip}:2379 > etcd.log &
-        SHELL
-      end
-
-      # Set Docker to use etcd for multihost, then reload systemctl and restart Docker.
-      host.vm.provision :shell, inline: "mkdir -p /etc/systemd/system/docker.service.d/"
-      host.vm.provision :shell, inline: %Q|sudo sh -c 'printf "[Service]\nExecStart=\nExecStart=/usr/bin/dockerd -H fd:// --cluster-store=etcd://#{primary_ip}:2379" > /etc/systemd/system/docker.service.d/10-execstart.conf'|
-      host.vm.provision :shell, inline: "systemctl daemon-reload"
-      host.vm.provision :shell, inline: "systemctl restart docker.service"
+      # Add kubernetes apt GPG key, add package source and install kubelet, kubeadm, kubectl and k8s-CNI binaries.
+      host.vm.provision :shell, inline: <<-SHELL
+      curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+      echo deb http://apt.kubernetes.io/ kubernetes-xenial main >> /etc/apt/sources.list.d/kubernetes.list
+      apt-get update
+      apt-get install -y kubelet kubeadm kubectl kubernetes-cni
+      SHELL
 
       # download calicoctl.
       host.vm.provision :shell, inline: "curl -L --silent #{calicoctl_url} -o /usr/local/bin/calicoctl"
 
       host.vm.provision :shell, inline: "chmod +x /usr/local/bin/calicoctl"
 
-      # Ensure the vagrant and root users get the ETCD_ENDPOINTS environment.
-      host.vm.provision :shell, inline: %Q|echo 'export ETCD_ENDPOINTS="http://#{primary_ip}:2379"' >> /home/vagrant/.profile|
-      host.vm.provision :shell, inline: %Q|sudo sh -c 'echo "Defaults env_keep +=\"ETCD_ENDPOINTS\"" >>/etc/sudoers'|
     end
   end
 end
