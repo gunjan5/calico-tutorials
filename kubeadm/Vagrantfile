@@ -33,6 +33,8 @@ Vagrant.configure(2) do |config|
   # if network "cable" is not connected: https://github.com/chef/bento/issues/682
   config.vm.provider "virtualbox" do |vb|
     vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+    vb.cpus = 2
+    vb.memory = 2048
   end
 
   # Set up each box
