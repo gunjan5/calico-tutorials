@@ -7,7 +7,7 @@ metadata:
 data:
   # The location of your etcd cluster.  This uses the Service clusterIP
   # defined below.
-  etcd_endpoints: "http://172.17.7.101:32379"
+  etcd_endpoints: "http://10.96.0.101:32379"
 
   # True enables BGP networking, false tells Calico to enforce
   # policy only, using native networking.
