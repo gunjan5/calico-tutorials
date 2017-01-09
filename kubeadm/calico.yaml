@@ -7,7 +7,7 @@ metadata:
 data:
   # The location of your etcd cluster.  This uses the Service clusterIP
   # defined below.
-  etcd_endpoints: "http://172.17.7.136:6666"
+  etcd_endpoints: "http://172.17.7.101:32379"
 
   # True enables BGP networking, false tells Calico to enforce
   # policy only, using native networking.
@@ -102,14 +102,14 @@ metadata:
   name: calico-etcd
   namespace: kube-system
 spec:
+  type: NodePort
+  ports:
+    - port: 6666
+      nodePort: 32379
   # Select the calico-etcd pod running on the master.
   selector:
     k8s-app: calico-etcd
-  # This ClusterIP needs to be known in advance, since we cannot rely
-  # on DNS to get access to etcd.
-  clusterIP: 172.17.7.136
-  ports:
-    - port: 6666
+
 
 ---
 
