@@ -171,6 +171,12 @@ spec:
             # Auto-detect the BGP IP address.
             - name: IP
               value: ""
+            - name: IP_AUTODETECTION_METHOD
+              value: "can-reach=10.96.0.101"
+            - name: IP6
+              value: "autodetect"
+            - name: IP6_AUTODETECTION_METHOD
+              value: "first-found"
           securityContext:
             privileged: true
           volumeMounts:
@@ -198,7 +204,7 @@ spec:
                 configMapKeyRef:
                   name: calico-config
                   key: cni_network_config
-          volumeMounts:
+          volumeMounts:   
             - mountPath: /host/opt/cni/bin
               name: cni-bin-dir
             - mountPath: /host/etc/cni/net.d
