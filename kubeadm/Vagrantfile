@@ -55,7 +55,6 @@ Vagrant.configure(2) do |config|
       # The docker provisioner installs docker.
       host.vm.provision :docker, images: [
           "calico/node:#{calico_node_ver}",
-          "calico/ctl:#{calico_node_ver}",
       ]
 
       # Add kubernetes apt GPG key, add package source and install kubelet, kubeadm, kubectl and k8s-CNI binaries.
