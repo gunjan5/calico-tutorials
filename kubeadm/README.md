@@ -8,7 +8,7 @@ Steps:
 4. (optional) `kubectl join --token=<some.token> 10.96.0.101:6443 --discovery-token-ca-cert-hash sha256:<hash>` (on `node-02`)
 5. Run the following commands to configure kubectl to talk to the API server:
  ```bash
-   mkdir -p $HOME/.kube
+  mkdir -p $HOME/.kube
   sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
   sudo chown $(id -u):$(id -g) $HOME/.kube/config
   ```
