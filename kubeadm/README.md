@@ -13,6 +13,8 @@ Steps:
   sudo chown $(id -u):$(id -g) $HOME/.kube/config
   ```
 6. `kubectl apply -f https://docs.projectcalico.org/master/getting-started/kubernetes/installation/hosted/kubeadm/1.7/calico.yaml`
-7. `watch kubectl get pods -o wide --all-namespaces`
+7. If it's a single node setup/sandbox then run the following command to allow scheduling pods on master node:
+`kubectl taint nodes --all node-role.kubernetes.io/master-`
+8. `watch kubectl get pods -o wide --all-namespaces`
 
 Kubeadm getting started guide: https://kubernetes.io/docs/getting-started-guides/kubeadm/
